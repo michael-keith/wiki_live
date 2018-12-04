@@ -1,0 +1,16 @@
+{
+  "name": "Wiki Live",
+  "version": "0.0.1",
+  "description": "Live feed of Wikipedia recent changes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "eventsource": "^1.0.7",
+    "mysql": "^2.16.0"
+  }
+}
