@@ -41,7 +41,7 @@ eventSource.onmessage = function(event) {
   var inserts = [data.type, data.bot, data.comment, size, data.meta.uri, data.user, data.wiki, data.timestamp];
   sql = mysql.format(sql, inserts);
 
-  pool.query(sql, function (error, results, fields) {
+  pool.query(sql, function (error) {
     if (error) throw error;
   });
 
