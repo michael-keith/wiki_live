@@ -1,5 +1,5 @@
 {
-  "name": "Wiki Live",
+  "name": "WikiLive",
   "version": "0.0.1",
   "description": "Live feed of Wikipedia recent changes",
   "main": "index.js",
