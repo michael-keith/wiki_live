@@ -24,25 +24,27 @@ eventSource.onerror = function(event) {
   console.error('--- Encountered error', event);
 };
 
-var wiki = 'enwiki';
 eventSource.onmessage = function(event) {
-  var data = JSON.parse(event.data);
-  //if (change.wiki == wiki) {
-  console.log("-------------------------");
-  console.log("USER: " + data.user);
-  console.log("TYPE: " + data.type);
-  console.log("PAGE: " + data.meta.uri);
-  console.log("WIKI: " + data.wiki);
-  //console.log(data);
-  //}
-
-  var sql = "INSERT INTO changes(type,bot,comment,size,uri,user,wiki,timestamp) VALUES(?,?,?,?,?,?,?,?)";
-  if(data.length) {size = (data.length.new - data.length.old);} else {size = 0;}
-  var inserts = [data.type, data.bot, data.comment, size, data.meta.uri, data.user, data.wiki, data.timestamp];
-  sql = mysql.format(sql, inserts);
-
-  pool.query(sql, function (error) {
-    if (error) throw error;
-  });
-
+  dbAddChange(event);
 };
+
+function dbAddChange(event) {
+
+  var data = JSON.parse(event.data);
+  if (data.wiki == "enwiki") {
+    console.log("-------------------------");
+    console.log("USER: " + data.user);
+    console.log("TYPE: " + data.type);
+    console.log("PAGE: " + data.meta.uri);
+    console.log("WIKI: " + data.wiki);
+    //console.log(data);
+
+    var sql = "INSERT INTO changes(type,bot,title,comment,size,uri,user,wiki,timestamp,namespace) VALUES(?,?,?,?,?,?,?,?,?,?)";
+    if(data.length) {size = (data.length.new - data.length.old);} else {size = 0;}
+    var inserts = [data.type, data.bot, data.title, data.comment, size, data.meta.uri, data.user, data.wiki, data.timestamp, data.namespace];
+    sql = mysql.format(sql, inserts);
+
+    pool.query(sql, function (error) {if (error) throw error;});
+  }
+
+}
