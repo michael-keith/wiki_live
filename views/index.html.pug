@@ -3,11 +3,38 @@ html(lang='en')
   head
     title= title
     script(src="/socket.io/socket.io.js")
+
     script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js")
-    script(src="main.js")
-    script(src="p5/p5.min.js")
-    script(src="p5/sketch.js")
+    script(src="https://d3js.org/d3.v5.min.js")
+    script(src="js/c3/c3.min.js" type="text/javascript")
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js")
+    script(src="/js/bootstrap/bootstrap.min.js")
+
+    link(href="css/bootstrap.min.css",rel="stylesheet",type="text/css")
+    link(rel="stylesheet", href="js/c3/c3.min.css")
 
   body
-    div(id="sketch_holder")
-    div(id="wiki_feed")
+    div(class="container-fluid")
+      div(class="row")
+        div(class="col-md-9 order-md-2")
+          div(id="sketch_holder")
+        div(class="col-md-3 order-md-1")
+          div(id="wiki_feed")
+
+      div(class="row")
+        div(class="col-md-6")
+          div(class="row")
+            div(class="col-md-6")
+              div(id="daily_feed")
+            div(class="col-md-6")
+              div(id="daily_chart")
+        div(class="col-md-6")
+          div(class="row")
+            div(class="col-md-6")
+              div(id="weekly_feed")
+            div(class="col-md-6")
+              div(id="weekly_chart")
+
+      script(src="main.js")
+      script(src="p5/p5.min.js")
+      script(src="p5/sketch.js")

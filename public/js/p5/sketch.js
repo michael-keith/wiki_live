@@ -1,7 +1,8 @@
 var points = [];
 
 function setup() {
-  var width = window.innerWidth;
+  //var width = window.innerWidth;
+  var width = document.getElementById("sketch_holder").offsetWidth
   var height = window.innerHeight / 2;
 
   frameRate(30);
@@ -55,12 +56,12 @@ class Point {
   constructor(time, size, title, index) {
     this.x = time + 300 + (width/2);
     this.y = index * 40;
-    this.size = 20;
+    this.size = 15;
     this.lifetime = 300;
     this.title = title;
 
     noStroke();
-    textSize(20);
+    textSize(17);
     fill(0, this.lifetime);
 
     this.tw = textWidth(this.title);
@@ -74,13 +75,13 @@ class Point {
     strokeWeight(3);
     stroke(0, this.lifetime);
     fill(255);
-    ellipse(this.x, this.y, this.size, this.size);
+    ellipse(this.x, this.y, 10, 10);
 
     noStroke();
-    textSize(20);
+    textSize(17);
     fill(0, this.lifetime);
     if(this.mouse_over) { fill(255,0,0, this.lifetime); }
-    text(this.title, this.x + 20, this.y + 6)
+    text(this.title, this.x + 10, this.y + 6)
 
     if(this.mouse_over) {
       stroke(0);
