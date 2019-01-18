@@ -29,12 +29,13 @@ app.get('/data/daily', getDailyData);
 app.get('/data/weekly', getWeeklyData);
 app.get('/table/daily', getDailyTable);
 app.get('/table/weekly', getWeeklyTable);
+app.get('/data/page', getPageEdits);
 
 
 //Socket
 io.on('connection', function(socket){
-    // console.log("Connected");
-    // console.log(socket.id);
+  // console.log("Connected");
+  // console.log(socket.id);
 });
 
 //Start Server
@@ -88,18 +89,18 @@ function dbInsert(data) {
 // Main timer for setters
 //////////////////////////////////////////////
 setInterval(function () {
-    setHourly();
-    setHourlyData();
-    setSizes();
-    setEpm();
+  setHourly();
+  setHourlyData();
+  setSizes();
+  setEpm();
 }, 1000);
 
 setInterval(function () {
-    setDailyTable();
-    setWeeklyTable();
-    setDailyData();
-    setWeeklyData();
-    setSizeData()
+  setDailyTable();
+  setWeeklyTable();
+  setDailyData();
+  setWeeklyData();
+  setSizeData()
 }, 5000);
 
 ///////////////////////////////////////
@@ -252,4 +253,14 @@ function setSizeData() {
 
 function getMainStats(req, res) {
   res.send({"hourly_count": hourly_count, "hourly_data": hourly_data, "neg_count": neg_count, "pos_count": pos_count, "pos_data": pos_data, "neg_data":neg_data, "epm": epm});
+}
+
+//Specific page details
+function getPageEdits(req, res) {
+  title = req.query.title;
+  var sql = "SELECT * FROM changes WHERE title = ? ORDER BY timestamp DESC LIMIT 5";
+  pool.query(sql, [title], function (error, results, fields) {
+    if (error) throw error;
+    res.send(results);
+  });
 }

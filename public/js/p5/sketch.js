@@ -45,8 +45,7 @@ function mousePressed() {
   points.forEach(function(point, index){
 
     if(mouseX > point.bx && mouseX < point.bxe && mouseY > point.by && mouseY < point.bye) {
-      //console.log(point.title);
-      //feed_active = false;
+      getPageEdits(point.title);
     }
 
   });

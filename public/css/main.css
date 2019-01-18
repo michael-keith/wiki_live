@@ -41,22 +41,46 @@ a {
   margin: 0 0 20px 0;
 }
 
-#wiki-feed {
+#wiki_feed {
+}
 
+.feed_box, .page_box {
+  padding: 5px 0 5px 5px;
+  margin: 0 0 5px 0;
+  background-color: #f0f3f6;
+  font-size: 14px;
 }
 
 .feed_box {
-  padding: 5px 0 5px 5px;
-  margin: 0 0 5px 0;
   border-left: 5px solid #5694e3;
-  background-color: #f0f3f6;
-  font-size: 14px;
   opacity: 0;
+}
+
+.page_box {
+  border-left: 5px solid #70d3d0;
 }
 
 .feed_box p {
   margin: 0 0 5px 0;
   padding: 0;
+}
+
+.page_box p {
+  margin: 0 0 5px 0;
+  padding: 0;
+  word-wrap:break-word;
+}
+
+#back {
+  border-left: 5px solid #e7263b;
+  background-color: #FFEEEE;
+  font-weight: bold;
+  padding: 5px 0 5px 0;
+  margin: 0 0 10px 0;
+}
+#back a {
+  font-weight: bold;
+  margin: 0px 5px 0px 5px;
 }
 
 .pos {
