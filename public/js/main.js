@@ -1,3 +1,32 @@
+// Check whether user is viewing page
+page_vis_state = 1;
+var visibilityChange = (function (window) {
+inView = false;
+return function (fn) {
+	window.onfocus = window.onblur = window.onpageshow = window.onpagehide = function (e) {
+		if ({focus:1, pageshow:1}[e.type]) {
+			if (inView) return;
+			fn("visible");
+			inView = true;
+		} else if (inView) {
+			fn("hidden");
+			inView = false;
+		}
+	};
+};
+}(this));
+visibilityChange(function (state) {
+if (state=="hidden")
+{
+  page_vis_state = 0;
+}
+if (state=="visible")
+{
+	page_vis_state = 1;
+}
+});
+
+// Live feed
 var feed_items = [];
 var index = 1;
 
@@ -6,17 +35,20 @@ var last_point = "";
 $(function () {
   var socket = io();
   socket.on('wiki_feed', feedAdd);
-  socket.on('wiki_daily', feedDaily);
-  socket.on('wiki_weekly', feedWeekly);
 });
 
 function feedAdd(change) {
   time = Date.now();
-  $( "#wiki_feed" ).prepend( "<p id='feed_" + time + "'><b>" + change.title + "</b> - " + change.user + " (" + change.size + ")" + "</p>" );
+  if(change.size > 0) {size_symbol = "▲"; size_class="pos"} else {size_symbol = "▼"; size_class="neg"}
+  if(change.bot == true){bot_symbol = "*";} else {bot_symbol = "";}
+  user_colour = intToRGB(hashCode(change.user));
+  text_colour = getColorByBgColor(user_colour);
+  $( "#wiki_feed" ).prepend( "<div id='feed_" + time + "' class='feed_box'><p><b>● " + change.title + "</b> <span class='feed_badge "+size_class+"'>" + size_symbol + change.size + " bytes</span></p><span class='feed_badge user_badge' style='color: "+text_colour+"; background-color: #"+user_colour+"'>User:</b> "+change.user+" "+bot_symbol+"</span></div>" );
+  $( "#feed_" + time ).fadeTo( "slow" , 1 );
   feed_items.unshift(time);
 
-  if(change.title != last_point) {
-    points.unshift(new Point(change.time, change.size, change.title, index));
+  if(change.title != last_point && page_vis_state) {
+    points.unshift(new Point(change.time, change.size, change.title, index, change.user, change.comment));
 
     if( index > 10 ) { index=1; }
     else {index++;}
@@ -36,157 +68,41 @@ function feedCull() {
   }
 }
 
-function feedDaily(results) {
-  $( "#daily_feed" ).html( "" );
-  results.results.forEach(function(result){
-    $( "#daily_feed" ).append( "<p>" + result.title + " - " +  result.total + "</p>" );
-  });
-}
-
-function feedWeekly(results) {
-  $( "#weekly_feed" ).html( "" );
-  results.results.forEach(function(result){
-    $( "#weekly_feed" ).append( "<p>" + result.title + " - " +  result.total + "</p>" );
-  });
-}
-
-
-
-var daily_data = [];
-var daily_dates = [];
-
-var weekly_data = [];
-var weekly_dates = [];
-
 getDailyData();
 getWeeklyData();
 
-daily_chart = c3.generate({
-  bindto: '#daily_chart',
-  padding: {
-        top: 0,
-        right: 10,
-        bottom: 0,
-        left: 50,
-    },
-    data: {
-        x: 'x',
-        xFormat: '%Y-%m-%d %H',
-        columns: [
-        ]
-    },
-    axis: {
-        x: {
-            type: 'timeseries',
-            tick: {
-                format: '%H'
-            }
-        },
-        y: {
-         min: 0,
-         padding: {top: 20, bottom: 20}
-        }
-
-    }
-});
-
-weekly_chart = c3.generate({
-  bindto: '#weekly_chart',
-  padding: {
-        top: 0,
-        right: 10,
-        bottom: 0,
-        left: 50,
-    },
-    data: {
-        x: 'x',
-        xFormat: '%Y-%m-%d',
-        columns: [
-        ]
-    },
-    axis: {
-        x: {
-            type: 'timeseries',
-            tick: {
-                format: '%d'
-            }
-        },
-        y: {
-         min: 0,
-         padding: {top: 20, bottom: 20}
-        }
-
-    }
-});
-
+getDailyTable();
+getWeeklyTable();
 
 setInterval(function () {
     getDailyData();
     getWeeklyData();
 
+    getDailyTable();
+    getWeeklyTable();
 }, 5000);
 
-function getDailyData() {
-
-  $.ajax({
-    dataType: "json",
-    url: "/data/daily",
-    success: function(result){
-      data = result;
-      parseDailyData(data);
+function hashCode(str) { // java String#hashCode
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+       hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-  });
+    return hash;
 }
 
-function getWeeklyData() {
+function intToRGB(i){
+    var c = (i & 0x00FFFFFF)
+        .toString(16)
+        .toUpperCase();
 
-  $.ajax({
-    dataType: "json",
-    url: "/data/weekly",
-    success: function(result){
-      data = result;
-      parseWeeklyData(data);
-    }
-  });
-
+    return "00000".substring(0, 6 - c.length) + c;
 }
 
-function parseDailyData(data) {
-
-  daily_data = [];
-  daily_dates = [];
-
-  data.forEach(function(d){
-    daily_dates.push(d["d"]);
-    daily_data.push(d["total"]);
-  });
-  daily_dates.unshift("x");
-  daily_data.unshift("data_1");
-
-  daily_chart.load({
-      columns: [
-          daily_dates, daily_data
-      ]
-  });
-
-}
-
-function parseWeeklyData(data) {
-
-  weekly_data = [];
-  weekly_dates = [];
-
-  data.forEach(function(d){
-    weekly_dates.push(d["d"]);
-    weekly_data.push(d["total"]);
-  });
-  weekly_dates.unshift("x");
-  weekly_data.unshift("data_1");
-
-  weekly_chart.load({
-      columns: [
-          weekly_dates, weekly_data
-      ]
-  });
-
+function getColorByBgColor(bgColor) {
+  var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+  var r = parseInt(color.substring(0, 2), 16); // hexToR
+  var g = parseInt(color.substring(2, 4), 16); // hexToG
+  var b = parseInt(color.substring(4, 6), 16); // hexToB
+  return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 180) ?
+    "#000" : "#FFF";
 }

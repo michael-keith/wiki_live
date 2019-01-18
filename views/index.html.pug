@@ -12,29 +12,94 @@ html(lang='en')
 
     link(href="css/bootstrap.min.css",rel="stylesheet",type="text/css")
     link(rel="stylesheet", href="js/c3/c3.min.css")
+    link(rel="stylesheet", href="css/main.css")
 
   body
     div(class="container-fluid")
       div(class="row")
+        div(class="col-md-12")
+          h1 WikiLive
+
+      div(id="live_feeds", class="row")
         div(class="col-md-9 order-md-2")
+          div(class="col-md-12")
+
+            div(class="row")
+              div(id="epd_div" class="col-md-4")
+                div(class="stat_box")
+                  h2 Page edits in past hour:
+                  h2(id="epd" class="stat_figure") 0
+                  div(id="epd_chart")
+
+              div(class="col-md-4")
+                div(class="stat_box clear")
+                  h2 Total size of edits in last hour:
+                  h2(id="total_size" class="stat_figure")
+                  p(id="sph_text")
+                  div(id="sph_bar")
+                    div(id="neg_bar")
+                      p(id="neg_text")
+                    div(id="pos_bar")
+                      p(id="pos_text")
+
+              div(class="col-md-4")
+                div(id="epm_div" class="stat_box")
+                  div(id="epm_guage")
+                  div(style="text-align: center;")
+                    h2 page edits in last minute
+
+
           div(id="sketch_holder")
-        div(class="col-md-3 order-md-1")
-          div(id="wiki_feed")
+
+        div(class="col-md-3 order-md-1 pr-0 pl-0")
+          div(class="feed_wrapper")
+            h2 Live feed:
+            div(id="wiki_feed")
 
       div(class="row")
         div(class="col-md-6")
           div(class="row")
-            div(class="col-md-6")
-              div(id="daily_feed")
-            div(class="col-md-6")
-              div(id="daily_chart")
+
+            div(class="col-md-6 pr-1")
+              div(class="feed_wrapper")
+                h2 Top posts by number of edits last 24 hours:
+                div(id="daily_table")
+                  div(class="table-responsive")
+                    table(class="table")
+                      thead
+                        tr
+                          th Title
+                          th No of edits
+                      tbody(id="daily_feed")
+
+            div(class="col-md-6 pl-1")
+              div(class="feed_wrapper")
+                h2 Number of edits per hour last 24 hours:
+                div(id="daily_chart")
+
         div(class="col-md-6")
           div(class="row")
-            div(class="col-md-6")
-              div(id="weekly_feed")
-            div(class="col-md-6")
-              div(id="weekly_chart")
 
-      script(src="main.js")
-      script(src="p5/p5.min.js")
-      script(src="p5/sketch.js")
+            div(class="col-md-6 pr-1")
+              div(class="feed_wrapper")
+                div(id="weekly_table")
+                  h2 Top posts by number of edits last week:
+                  div(class="table-responsive")
+                    table(class="table")
+                      thead
+                        tr
+                          th Title
+                          th No of edits
+                      tbody(id="weekly_feed")
+
+            div(class="col-md-6 pl-1")
+              div(class="feed_wrapper")
+                h2 Number of edits per day last week:
+                div(id="weekly_chart")
+
+      script(src="js/main_stats.js")
+      script(src="js/daily.js")
+      script(src="js/weekly.js")
+      script(src="js/main.js")
+      script(src="js/p5/p5.min.js")
+      script(src="js/p5/sketch.js")

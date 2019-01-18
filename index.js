@@ -1,6 +1,7 @@
 require('dotenv').config();
 
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
@@ -22,26 +23,18 @@ app.set('view engine', 'pug')
 
 //Routes
 app.get('/', indexView);
-app.get('/data/daily', dailyData);
-app.get('/data/weekly', weeklyData);
+app.use(express.static('public'));
+app.get('/data/stats', getMainStats);
+app.get('/data/daily', getDailyData);
+app.get('/data/weekly', getWeeklyData);
+app.get('/table/daily', getDailyTable);
+app.get('/table/weekly', getWeeklyTable);
 
-//Routes for files
-app.get('/main.js', mainScriptInc);
-app.get('/p5/p5.min.js', p5ScriptInc);
-app.get('/p5/sketch.js', sketchScriptInc);
-app.get('/css/bootstrap.min.css', bootstrapCssInc);
-app.get('/js/bootstrap/bootstrap.min.js', bootstrapJsInc);
-app.get('/js/c3/c3.min.js', c3JsInc);
-app.get('/js/c3/c3.min.css', c3CssInc);
-
-setInterval(function(){
-  getDaily();
-  getWeekly();
-}, 3000);
 
 //Socket
 io.on('connection', function(socket){
     console.log("Connected");
+    console.log(socket.id);
 });
 
 //Start Server
@@ -70,7 +63,7 @@ eventSource.onmessage = function(event) {
     if(data.length) {size = (data.length.new - data.length.old);} else {size = 0;}
     ts = Math.round((new Date()).getTime() / 1000);
     time = ts - data.timestamp;
-    io.emit("wiki_feed", {"title": data.title, "user": data.user, "size": size, "time": time });
+    io.emit("wiki_feed", {"id": data.id, "title": data.title, "user": data.user, "size": size, "time": time, "bot": data.bot, "comment": data.comment });
     dbInsert(data);
   }
 
@@ -79,29 +72,6 @@ eventSource.onmessage = function(event) {
 //View functions
 function indexView(req, res) {
   res.render('index.html.pug', { title: 'Wiki Feed' })
-}
-
-// Script Routes
-function mainScriptInc(req, res) {
-  res.sendFile(__dirname + '/public/js/main.js');
-}
-function p5ScriptInc(req, res) {
-  res.sendFile(__dirname + '/public/js/p5/p5.min.js');
-}
-function sketchScriptInc(req, res) {
-  res.sendFile(__dirname + '/public/js/p5/sketch.js');
-}
-function bootstrapCssInc(req, res) {
-  res.sendFile(__dirname + '/public/css/bootstrap.min.css');
-}
-function bootstrapJsInc(req, res) {
-  res.sendFile(__dirname + '/public/js/bootstrap/bootstrap.min.js');
-}
-function c3JsInc(req, res) {
-  res.sendFile(__dirname + '/public/js/c3/c3.min.js');
-}
-function c3CssInc(req, res) {
-  res.sendFile(__dirname + '/public/js/c3/c3.min.css');
 }
 
 //DB functions
@@ -114,40 +84,125 @@ function dbInsert(data) {
   pool.query(sql, function (error) {if (error) throw error;});
 }
 
-//get Lists
-function getDaily() {
+// Main timer for setters
+setInterval(function () {
+    setHourly();
+    setHourlyData();
+    setSizes();
+    setEpm();
+}, 1000);
+
+setInterval(function () {
+    setDailyTable();
+    setWeeklyTable();
+    setDailyData();
+    setWeeklyData();
+}, 5000);
+
+var daily_table;
+setDailyTable();
+function setDailyTable() {
   var sql = "SELECT title, COUNT(*) as total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) GROUP BY title ORDER BY total DESC LIMIT 10";
-
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
-    io.emit("wiki_daily", { results });
+    daily_table = results;
   });
 }
+function getDailyTable(req, res) {
+  res.send(daily_table);
+}
 
-function getWeekly() {
+var weekly_table;
+setWeeklyTable();
+function setWeeklyTable() {
   var sql = "SELECT title, COUNT(*) as total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 604800) GROUP BY title ORDER BY total DESC LIMIT 10";
-
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
-    io.emit("wiki_weekly", { results });
+    weekly_table = results;
   });
 }
+function getWeeklyTable(req, res) {
+  res.send(weekly_table);
+}
 
-//Controllers for data
-function dailyData(req, res) {
-  var sql = "SELECT COUNT(*) AS total, FROM_UNIXTIME(timestamp, '%Y-%m-%d %h') AS d FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) group by d";
-
+var daily_data;
+setDailyData();
+function setDailyData() {
+  var sql = "SELECT COUNT(*) AS total, FROM_UNIXTIME(timestamp, '%Y-%m-%d %H') AS d FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) group by d";
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
-    res.send(results);
+    daily_data = results;
   });
 }
+function getDailyData(req, res) {
+  res.send(daily_data);
+}
 
-function weeklyData(req, res) {
+var weekly_data;
+setWeeklyData();
+function setWeeklyData() {
   var sql = "SELECT COUNT(*) AS total, FROM_UNIXTIME(timestamp, '%Y-%m-%d') AS d FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 604800) group by d";
+  pool.query(sql, function (error, results, fields) {
+    if (error) throw error;
+    weekly_data = results;
+  });
+}
+function getWeeklyData(req, res) {
+  res.send(weekly_data);
+}
+
+// Main stat
+
+var hourly_count;
+setHourly();
+function setHourly() {
+  var sql = "SELECT COUNT(*) AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 3600)";
 
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
-    res.send(results);
+    hourly_count = results[0].total;
   });
+}
+
+var hourly_data;
+setHourlyData();
+function setHourlyData() {
+  var sql = "SELECT COUNT(*) AS total, FROM_UNIXTIME(timestamp, '%Y-%m-%d %H:%i') AS d FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 3600) GROUP BY d";
+
+  pool.query(sql, function (error, results, fields) {
+    if (error) throw error;
+    hourly_data = results;
+  });
+}
+
+var neg_count;
+var pos_count;
+setSizes();
+function setSizes() {
+  var neg_sql = "SELECT SUM(size) AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 3600) AND size < 0";
+  var pos_sql = "SELECT SUM(size) AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 3600) AND size > 0";
+
+  pool.query(neg_sql, function (error, results, fields) {
+    if (error) throw error;
+    neg_count = results[0].total;
+  });
+  pool.query(pos_sql, function (error, results, fields) {
+    if (error) throw error;
+    pos_count = results[0].total;
+  });
+}
+
+var epm;
+setEpm();
+function setEpm() {
+  var sql = "SELECT COUNT(*) AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 60)";
+
+  pool.query(sql, function (error, results, fields) {
+    if (error) throw error;
+    epm = results[0].total;
+  });
+}
+
+function getMainStats(req, res) {
+  res.send({"hourly_count": hourly_count, "hourly_data": hourly_data, "neg_count": neg_count, "pos_count": pos_count, "epm": epm});
 }

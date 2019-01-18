@@ -2,7 +2,7 @@ var points = [];
 
 function setup() {
   //var width = window.innerWidth;
-  var width = document.getElementById("sketch_holder").offsetWidth
+  var width = document.getElementById("sketch_holder").offsetWidth - 40;
   var height = window.innerHeight / 2;
 
   frameRate(30);
@@ -14,7 +14,8 @@ function setup() {
 
 function draw() {
 
-  background(255);
+  background(240,243,246);
+  //background(255);
 
   strokeWeight(10);
   stroke(0);
@@ -23,8 +24,8 @@ function draw() {
     point.draw();
 
     if(mouseX > point.bx && mouseX < point.bxe && mouseY > point.by && mouseY < point.bye) {
-      // document.body.style.cursor = "pointer";
       point.mouse_over = true;
+      // point.mouseOver();
     }
     else {point.mouse_over = false;}
 
@@ -32,15 +33,15 @@ function draw() {
 
 }
 
-function mousePressed() {
-  points.forEach(function(point, index){
-
-    if(mouseX > point.bx && mouseX < point.bxe && mouseY > point.by && mouseY < point.bye) {
-      console.log(point.title);
-    }
-
-  });
-}
+// function mousePressed() {
+//   points.forEach(function(point, index){
+//
+//     if(mouseX > point.bx && mouseX < point.bxe && mouseY > point.by && mouseY < point.bye) {
+//       console.log(point.title);
+//     }
+//
+//   });
+// }
 
 // function mouseMoved() {
 //   points.forEach(function(point, index){
@@ -53,12 +54,19 @@ function mousePressed() {
 // }
 
 class Point {
-  constructor(time, size, title, index) {
+  constructor(time, size, title, index, user, comment) {
     this.x = time + 300 + (width/2);
     this.y = index * 40;
     this.size = 15;
-    this.lifetime = 300;
+    this.lifetime = 400;
     this.title = title;
+
+    this.bytes = size;
+    if(size > 0) {this.bytes_symbol = "▲";}
+    else {this.bytes_symbol = "▼";}
+    this.user = user;
+    this.user_colour = intToRGB(hashCode(this.user));
+    this.comment = comment;
 
     noStroke();
     textSize(17);
@@ -73,21 +81,21 @@ class Point {
   draw() {
 
     strokeWeight(3);
-    stroke(0, this.lifetime);
-    fill(255);
+    stroke("#" + this.user_colour);
+    fill("#" + this.user_colour);
     ellipse(this.x, this.y, 10, 10);
 
     noStroke();
     textSize(17);
     fill(0, this.lifetime);
-    if(this.mouse_over) { fill(255,0,0, this.lifetime); }
+    if(this.mouse_over) { fill(62,110,176, this.lifetime); }
     text(this.title, this.x + 10, this.y + 6)
 
     if(this.mouse_over) {
       stroke(0);
       strokeWeight(5);
       noFill();
-      rect(this.bx, this.by, this.total_length + (this.size * 2), this.size*2 );
+      // rect(this.bx, this.by, this.total_length + (this.size * 2), this.size*2 );
     }
 
     this.x -=4;
@@ -102,5 +110,26 @@ class Point {
     this.by = this.y - this.size;
     this.bye = this.by + (this.size*2);
   }
+
+  // mouseOver() {
+  //
+  //   fill(255,255,255);
+  //   strokeWeight(0);
+  //   rect(this.bx, this.bye, 450, 100 + textHeight(this.comment));
+  //
+  //   stroke(0);
+  //   fill(0);
+  //   text("Size: ", this.bx + 10, this.bye + 25);
+  //   text(this.bytes_symbol, this.bx + 63, this.bye + 23);
+  //   text(this.bytes + " bytes", this.bx + 85, this.bye + 25);
+  //
+  //   text("User: ", this.bx + 10, this.by + 80);
+  //   fill("#" + this.user_colour);
+  //   ellipse(this.bx + 70, this.by + 74, 15, 15);
+  //   fill(0);
+  //   text(this.user, this.bx + 85, this.by + 80 );
+  //
+  //   text(this.comment, this.bx + 10, this.by + 100, 440);
+  // }
 
 }
