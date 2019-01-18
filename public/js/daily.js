@@ -18,13 +18,13 @@ function parseDailyTable(results) {
   if(daily_table_type == "no") {
     $( "#daily_feed" ).html( "" );
     results.no.forEach(function(result){
-      $( "#daily_feed" ).append( "<tr><td>" + result.title + "</td><td class='centered'>" +  result.total + "</td></tr>" );
+      $( "#daily_feed" ).append( "<tr><td><a href=" + result.uri + ">" + result.title + "</a></td><td class='centered'>" +  result.total + "</td></tr>" );
     });
   }
   else {
     $( "#daily_feed" ).html( "" );
     results.size.forEach(function(result){
-      $( "#daily_feed" ).append( "<tr><td>" + result.title + "</td><td class='centered'>" +  result.total + "B</td></tr>" );
+      $( "#daily_feed" ).append( "<tr><td><a href=" + result.uri + ">" + result.title + "</a></td><td class='centered'>" +  result.total + "B</td></tr>" );
     });
   }
 

@@ -109,12 +109,12 @@ var daily_table;
 var daily_table_size;
 setDailyTable();
 function setDailyTable() {
-  var sql = "SELECT title, COUNT(*) as total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) GROUP BY title ORDER BY total DESC LIMIT 10";
+  var sql = "SELECT title, uri, COUNT(*) as total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) GROUP BY title ORDER BY total DESC LIMIT 10";
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
     daily_table = results;
   });
-  var sql = "SELECT title, size AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) GROUP BY title ORDER BY ABS(size) DESC LIMIT 10";
+  var sql = "SELECT title, uri, SUM(ABS(size)) AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 86400) GROUP BY title ORDER BY ABS(size) DESC LIMIT 10";
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
     daily_table_size = results;
@@ -128,12 +128,12 @@ var weekly_table;
 var weekly_table_size;
 setWeeklyTable();
 function setWeeklyTable() {
-  var sql = "SELECT title, COUNT(*) as total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 604800) GROUP BY title ORDER BY total DESC LIMIT 10";
+  var sql = "SELECT title, uri, COUNT(*) as total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 604800) GROUP BY title ORDER BY total DESC LIMIT 10";
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
     weekly_table = results;
   });
-  var sql = "SELECT title, size AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 604800) GROUP BY title ORDER BY ABS(size) DESC LIMIT 10";
+  var sql = "SELECT title, uri, SUM(ABS(size)) AS total FROM changes WHERE timestamp > (UNIX_TIMESTAMP() - 604800) GROUP BY title ORDER BY ABS(size) DESC LIMIT 10";
   pool.query(sql, function (error, results, fields) {
     if (error) throw error;
     weekly_table_size = results;

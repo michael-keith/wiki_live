@@ -39,7 +39,7 @@ spark = c3.generate({
   },
   tooltip:{show:false},
   legend:{show:false},
-  size: {height:80, width:spark_width},
+  size: {height:80},
 });
 
 size_spark = c3.generate({
@@ -79,7 +79,7 @@ size_spark = c3.generate({
   },
   tooltip:{show:false},
   legend:{show:false},
-  size: {height:60, width:spark_width},
+  size: {height:60},
 });
 
 var epm_guage = c3.generate({
@@ -116,8 +116,7 @@ var epm_guage = c3.generate({
   legend:{show:false},
   tooltip:{show:false},
   size: {
-    height: 115,
-    width: guage_width
+    height: 115
   },
 });
 

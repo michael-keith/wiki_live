@@ -8,6 +8,10 @@ h2 {
   font-weight: bold;
 }
 
+a {
+  color: #3e6eb0;
+}
+
 #header {
   background-color: #3e6eb0;
   color: #FFF;
@@ -15,7 +19,7 @@ h2 {
   margin: 0 0 20px 0;
 }
 
-.navbar-brand {
+.header_title {
   font-size: 30px;
   font-weight: bold;
   margin: 0;
