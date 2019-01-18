@@ -14,6 +14,12 @@ function setup() {
 
 }
 
+function windowResized() {
+  var width = document.getElementById("sketch_holder").offsetWidth - 40;
+  var height = window.innerHeight / 2;
+  resizeCanvas(width, height);
+}
+
 function draw() {
 
   background(240,243,246);

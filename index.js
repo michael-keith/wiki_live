@@ -33,8 +33,8 @@ app.get('/table/weekly', getWeeklyTable);
 
 //Socket
 io.on('connection', function(socket){
-    console.log("Connected");
-    console.log(socket.id);
+    // console.log("Connected");
+    // console.log(socket.id);
 });
 
 //Start Server
@@ -43,7 +43,7 @@ http.listen(3000, function(){
 });
 
 eventSource.onopen = function(event) {
-  console.log('--- Opened connection.');
+  // console.log('--- Opened connection.');
 };
 
 eventSource.onerror = function(event) {
