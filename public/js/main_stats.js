@@ -39,7 +39,47 @@ spark = c3.generate({
   },
   tooltip:{show:false},
   legend:{show:false},
-  size: {height:50, width:spark_width},
+  size: {height:80, width:spark_width},
+});
+
+size_spark = c3.generate({
+  bindto: '#size_spark',
+  padding: {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  data: {
+    x: 'x',
+    xFormat: '%Y-%m-%d %H:%M',
+    columns: [
+    ]
+  },
+  types: {
+    edits: 'area',
+  },
+  axis: {
+    x: {
+      type: 'timeseries',
+      tick: {
+        format: '%M',
+        count: 5,
+      },
+      show: false,
+    },
+    y: {
+      padding: {top: 0, bottom: 0},
+      show: false,
+    }
+
+  },
+  point: {
+    show: false
+  },
+  tooltip:{show:false},
+  legend:{show:false},
+  size: {height:60, width:spark_width},
 });
 
 var epm_guage = c3.generate({
@@ -74,10 +114,11 @@ var epm_guage = c3.generate({
     }
   },
   legend:{show:false},
+  tooltip:{show:false},
   size: {
-    height: 90,
+    height: 115,
     width: guage_width
-  }
+  },
 });
 
 setInterval(function () {
@@ -89,7 +130,7 @@ function getStats() {
 
   $.ajax({
     dataType: "json",
-    url: "/data/stats",
+    url: main_url + "/data/stats",
     success: function(result){
       parseStats(result);
     }
@@ -109,6 +150,8 @@ function parseStats(results) {
   pos_perc = Math.round((Math.abs(results.pos_count)/( Math.abs(results.neg_count) + results.pos_count))*100) + "%";
   $( "#neg_bar" ).css( "width", neg_perc);
   $( "#pos_bar" ).css( "width", pos_perc);
+
+  parseSizeData(results.pos_data, results.neg_data);
 
   parseEpm(results.epm);
   last_epm = results.epm;
@@ -136,6 +179,38 @@ function parseHourlyData(data) {
     ],
     types: {
       edits: 'area',
+    },
+  });
+}
+
+function parseSizeData(pos_d, neg_d) {
+  pos_data = [];
+  neg_data = [];
+  dates = [];
+
+  pos_d.forEach(function(d, i){
+    if(i>0) {
+      dates.push(d["d"]);
+      pos_data.push(d["total"]);
+    }
+  });
+  dates.unshift("x");
+  pos_data.unshift("edits");
+
+  neg_d.forEach(function(d, i){
+    if(i>0) {
+      neg_data.push(d["total"]);
+    }
+  });
+  neg_data.unshift("edits_2");
+
+  size_spark.load({
+    columns: [
+      dates, pos_data, neg_data
+    ],
+    types: {
+      edits: 'area',
+      edits_2: 'area',
     }
   });
 }

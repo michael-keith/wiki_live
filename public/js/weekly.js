@@ -1,11 +1,12 @@
 var weekly_data = [];
 var weekly_dates = [];
+var weekly_table_type = "no";
 
 function getWeeklyTable() {
 
   $.ajax({
     dataType: "json",
-    url: "/table/weekly",
+    url: main_url + "/table/weekly",
     success: function(result){
       parseWeeklyTable(result);
     }
@@ -13,17 +14,27 @@ function getWeeklyTable() {
 }
 
 function parseWeeklyTable(results) {
-  $( "#weekly_feed" ).html( "" );
-  results.forEach(function(result){
-    $( "#weekly_feed" ).append( "<tr><td>" + result.title + "</td><td>" +  result.total + "</td></tr>" );
-  });
+
+  if(weekly_table_type == "no") {
+    $( "#weekly_feed" ).html( "" );
+    results.no.forEach(function(result){
+      $( "#weekly_feed" ).append( "<tr><td>" + result.title + "</td><td class='centered'>" +  result.total + "</td></tr>" );
+    });
+  }
+  else {
+    $( "#weekly_feed" ).html( "" );
+    results.size.forEach(function(result){
+      $( "#weekly_feed" ).append( "<tr><td>" + result.title + "</td><td class='centered'>" +  result.total + "B</td></tr>" );
+    });
+  }
+
 }
 
 function getWeeklyData() {
 
   $.ajax({
     dataType: "json",
-    url: "/data/weekly",
+    url: main_url + "/data/weekly",
     success: function(result){
       parseWeeklyData(result);
     }
@@ -36,7 +47,7 @@ function parseWeeklyData(data) {
   weekly_data = [];
   weekly_dates = [];
 
-  data.forEach(function(d){
+  data[weekly_table_type].forEach(function(d){
     weekly_dates.push(d["d"]);
     weekly_data.push(d["total"]);
   });
@@ -51,6 +62,24 @@ function parseWeeklyData(data) {
       edits: 'area',
     }
   });
+
+}
+
+function weeklyTableSwitch(type) {
+  weekly_table_type = type;
+  getWeeklyTable();
+  getWeeklyData();
+
+  if(type=="no"){
+    $("#tab_weekly_size").removeClass("active");
+    $("#tab_weekly_no").addClass("active");
+    $("#weekly_chart_title").text("Number of edits per day in the last week:");
+  }
+  else {
+    $("#tab_weekly_no").removeClass("active");
+    $("#tab_weekly_size").addClass("active");
+    $("#weekly_chart_title").text("Size of edits, in bytes, per day in the last week:");
+  }
 
 }
 
@@ -77,12 +106,11 @@ weekly_chart = c3.generate({
       padding: {left: 0, right: 5}
     },
     y: {
-      min: 0,
       padding: {top: 5, bottom: 0}
     }
 
   },
-  point: {
-    show: true
-  }
+  legend: {show: false},
+  point: { show: false },
+  tooltip: {show: false},
 });

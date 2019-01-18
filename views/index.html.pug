@@ -13,12 +13,18 @@ html(lang='en')
     link(href="css/bootstrap.min.css",rel="stylesheet",type="text/css")
     link(rel="stylesheet", href="js/c3/c3.min.css")
     link(rel="stylesheet", href="css/main.css")
+    link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.6.3/css/all.css", integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/", crossorigin="anonymous")
 
   body
+    nav(id="header", class="navbar navbar-expand-lg")
+      h1(class="navbar-brand") WikiLive: A Dashboard of recent changes to Wikipedia pages
+      ul(class="navbar-nav ml-auto")
+        li(class="nav-item")
+          a(class="head-link", href="https://github.com/michael-keith/wiki_live")
+            i(class="fab fa-github")
+
+
     div(class="container-fluid")
-      div(class="row")
-        div(class="col-md-12")
-          h1 WikiLive
 
       div(id="live_feeds", class="row")
         div(class="col-md-9 order-md-2")
@@ -27,7 +33,7 @@ html(lang='en')
             div(class="row")
               div(id="epd_div" class="col-md-4")
                 div(class="stat_box")
-                  h2 Page edits in past hour:
+                  h2 Total page edits in last hour:
                   h2(id="epd" class="stat_figure") 0
                   div(id="epd_chart")
 
@@ -35,12 +41,12 @@ html(lang='en')
                 div(class="stat_box clear")
                   h2 Total size of edits in last hour:
                   h2(id="total_size" class="stat_figure")
-                  p(id="sph_text")
                   div(id="sph_bar")
                     div(id="neg_bar")
                       p(id="neg_text")
                     div(id="pos_bar")
                       p(id="pos_text")
+                  div(id="size_spark")
 
               div(class="col-md-4")
                 div(id="epm_div" class="stat_box")
@@ -49,11 +55,11 @@ html(lang='en')
                     h2 page edits in last minute
 
 
-          div(id="sketch_holder")
+          div(id="sketch_holder" class="d-none d-sm-block")
 
         div(class="col-md-3 order-md-1 pr-0 pl-0")
           div(class="feed_wrapper")
-            h2 Live feed:
+            h2 Recently edited Wikipedia pages:
             div(id="wiki_feed")
 
       div(class="row")
@@ -62,19 +68,30 @@ html(lang='en')
 
             div(class="col-md-6 pr-1")
               div(class="feed_wrapper")
-                h2 Top posts by number of edits last 24 hours:
+                h2 Most edited pages in last 24 hours:
                 div(id="daily_table")
+
+                ul(class="nav nav-tabs")
+                  li(class="nav-item")
+                    a(class="nav-link active nav-link-title") Order by:
+                  ul(class="nav nav-tabs")
+                    li(class="nav-item")
+                      a(id="tab_daily_no", class="nav-link active", onClick="dailyTableSwitch('no')") No. of edits
+                  ul(class="nav nav-tabs")
+                    li(class="nav-item")
+                      a(id="tab_daily_size" class="nav-link", onClick="dailyTableSwitch('size')") Size of edits
+
                   div(class="table-responsive")
                     table(class="table")
                       thead
                         tr
                           th Title
-                          th No of edits
+                          th(class="centered") No of edits
                       tbody(id="daily_feed")
 
             div(class="col-md-6 pl-1")
               div(class="feed_wrapper")
-                h2 Number of edits per hour last 24 hours:
+                h2(id="daily_chart_title") Number of edits per hour last 24 hours:
                 div(id="daily_chart")
 
         div(class="col-md-6")
@@ -83,18 +100,29 @@ html(lang='en')
             div(class="col-md-6 pr-1")
               div(class="feed_wrapper")
                 div(id="weekly_table")
-                  h2 Top posts by number of edits last week:
+                  h2 Most edited pages in last week:
+
+                  ul(class="nav nav-tabs")
+                    li(class="nav-item")
+                      a(class="nav-link active nav-link-title") Order by:
+                    ul(class="nav nav-tabs")
+                      li(class="nav-item")
+                        a(id="tab_weekly_no", class="nav-link active", onClick="weeklyTableSwitch('no')") No. of edits
+                    ul(class="nav nav-tabs")
+                      li(class="nav-item")
+                        a(id="tab_weekly_size" class="nav-link", onClick="weeklyTableSwitch('size')") Size of edits
+
                   div(class="table-responsive")
                     table(class="table")
                       thead
                         tr
                           th Title
-                          th No of edits
+                          th(class="centered") No of edits
                       tbody(id="weekly_feed")
 
             div(class="col-md-6 pl-1")
               div(class="feed_wrapper")
-                h2 Number of edits per day last week:
+                h2(id="weekly_chart_title") Number of edits per day last week:
                 div(id="weekly_chart")
 
       script(src="js/main_stats.js")

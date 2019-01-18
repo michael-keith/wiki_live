@@ -1,3 +1,5 @@
+var frame_rate = 30;
+
 var points = [];
 
 function setup() {
@@ -5,7 +7,7 @@ function setup() {
   var width = document.getElementById("sketch_holder").offsetWidth - 40;
   var height = window.innerHeight / 2;
 
-  frameRate(30);
+  frameRate(frame_rate);
 
   var canvas = createCanvas(width, height);
   canvas.parent('sketch_holder');
@@ -33,15 +35,16 @@ function draw() {
 
 }
 
-// function mousePressed() {
-//   points.forEach(function(point, index){
-//
-//     if(mouseX > point.bx && mouseX < point.bxe && mouseY > point.by && mouseY < point.bye) {
-//       console.log(point.title);
-//     }
-//
-//   });
-// }
+function mousePressed() {
+  points.forEach(function(point, index){
+
+    if(mouseX > point.bx && mouseX < point.bxe && mouseY > point.by && mouseY < point.bye) {
+      //console.log(point.title);
+      //feed_active = false;
+    }
+
+  });
+}
 
 // function mouseMoved() {
 //   points.forEach(function(point, index){
@@ -133,3 +136,20 @@ class Point {
   // }
 
 }
+
+// class Line {
+//     constructor(id) {
+//       this.id = id;
+//       this.x = 300 + (width/2);
+//     }
+//     draw() {
+//       stroke(0);
+//       strokeWeight(1);
+//       line(this.x, 0, this.x, height);
+//       console.log(this.index);
+//       this.x -= 4;
+//     }
+//     cull() {
+//
+//     }
+// }

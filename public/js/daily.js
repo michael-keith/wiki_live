@@ -1,11 +1,12 @@
 var daily_data = [];
 var daily_dates = [];
+var daily_table_type = "no";
 
 function getDailyTable() {
 
   $.ajax({
     dataType: "json",
-    url: "/table/daily",
+    url: main_url + "/table/daily",
     success: function(result){
       parseDailyTable(result);
     }
@@ -13,17 +14,27 @@ function getDailyTable() {
 }
 
 function parseDailyTable(results) {
-  $( "#daily_feed" ).html( "" );
-  results.forEach(function(result){
-    $( "#daily_feed" ).append( "<tr><td>" + result.title + "</td><td>" +  result.total + "</td></tr>" );
-  });
+
+  if(daily_table_type == "no") {
+    $( "#daily_feed" ).html( "" );
+    results.no.forEach(function(result){
+      $( "#daily_feed" ).append( "<tr><td>" + result.title + "</td><td class='centered'>" +  result.total + "</td></tr>" );
+    });
+  }
+  else {
+    $( "#daily_feed" ).html( "" );
+    results.size.forEach(function(result){
+      $( "#daily_feed" ).append( "<tr><td>" + result.title + "</td><td class='centered'>" +  result.total + "B</td></tr>" );
+    });
+  }
+
 }
 
 function getDailyData() {
 
   $.ajax({
     dataType: "json",
-    url: "/data/daily",
+    url: main_url + "/data/daily",
     success: function(result){
       parseDailyData(result);
     }
@@ -35,7 +46,7 @@ function parseDailyData(data) {
   daily_data = [];
   daily_dates = [];
 
-  data.forEach(function(d){
+  data[daily_table_type].forEach(function(d){
     daily_dates.push(d["d"]);
     daily_data.push(d["total"]);
   });
@@ -50,6 +61,24 @@ function parseDailyData(data) {
       edits: 'area',
     }
   });
+
+}
+
+function dailyTableSwitch(type) {
+  daily_table_type = type;
+  getDailyTable();
+  getDailyData();
+
+  if(type=="no"){
+    $("#tab_daily_size").removeClass("active");
+    $("#tab_daily_no").addClass("active");
+    $("#daily_chart_title").text("Number of edits per hour last 24 hours:");
+  }
+  else {
+    $("#tab_daily_no").removeClass("active");
+    $("#tab_daily_size").addClass("active");
+    $("#daily_chart_title").text("Size of edits, in bytes, per hour last 24 hours:");
+  }
 
 }
 
@@ -76,12 +105,11 @@ daily_chart = c3.generate({
       padding: {left: 0, right: 5}
     },
     y: {
-      min: 0,
       padding: {top: 5, bottom: 0}
     }
 
   },
-  point: {
-    show: true
-  }
+  legend: {show: false},
+  point: { show: false },
+  tooltip: {show: false},
 });
