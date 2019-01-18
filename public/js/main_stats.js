@@ -121,7 +121,9 @@ var epm_guage = c3.generate({
 });
 
 setInterval(function () {
-  getStats();
+  if(page_vis_state) {
+    getStats();
+  }
 }, 1000);
 
 getStats();

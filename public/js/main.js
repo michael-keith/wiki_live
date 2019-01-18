@@ -80,11 +80,13 @@ getDailyTable();
 getWeeklyTable();
 
 setInterval(function () {
-  getDailyData();
-  getWeeklyData();
+  if(page_vis_state) {
+    getDailyData();
+    getWeeklyData();
 
-  getDailyTable();
-  getWeeklyTable();
+    getDailyTable();
+    getWeeklyTable();
+  }
 }, 10000);
 
 function hashCode(str) { // java String#hashCode
