@@ -1,6 +1,3 @@
-//var main_url = "/www/119/socket.io/";
-var main_url = "";
-
 // Check whether user is viewing page
 page_vis_state = 1;
 var visibilityChange = (function (window) {
